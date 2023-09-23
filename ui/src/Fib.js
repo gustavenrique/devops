@@ -15,34 +15,37 @@ class Fib extends Component {
         ]);
     }
 
-    // methods
-    async fetchValues() {
+    // custom methods
+    fetchValues = async () => {
         const { data: { data } } = await axios.get('/api/values/');
 
         console.dir('from postgres', data);
 
-        this.setState({ values: data });
+        if (data) this.setState({ values: data });
     }
 
-    async fetchIndexes() {
+    fetchIndexes = async () => {
         const { data: { data } } = await axios.get('/api/values/all-complete');
 
         console.dir('from redis', data);
 
-        this.setState({ seenIndexes: data });
+        if (data) this.setState({ seenIndexes: data });
     }
 
-    async handleSubmit(e) {
-        e.preventDefault();
+    handleSubmit = async (e) => {
+        try {
+            e.preventDefault();
 
-        const response = await axios.post('/api/values', { index: this.state.index });
+            const response = await axios.post('/api/values', { index: this.state.index });
 
-        console.dir('response: ', response);
+            console.dir('response: ', response);
 
-        this.setState({ index: '' })
+            this.setState({ index: '' })
+        } catch (error) {
+            console.error(error);
+        }
     }
 
-    // rendering
     render() {
         return (
             <div>
@@ -53,11 +56,11 @@ class Fib extends Component {
                 </form>
 
                 <h3>Indexes I have seen</h3>
-                {this.state.seenIndexes.map(({ index }) => index).join(', ')}
+                {this?.state?.values.map(({ index }) => index).join(', ')}
 
                 <h3>Values</h3>
-                {this.state.values.map(({ index, number }) => <div key={index}>
-                    For index {index} I calculated {number}
+                {this?.state?.seenIndexes?.map(({ index, value }) => <div key={index}>
+                    For index {index} I calculated {value}
                 </div>)}
             </div>
         )

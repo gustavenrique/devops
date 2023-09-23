@@ -1,8 +1,8 @@
 import { createClient } from 'redis';
-import config from './config';
+import { config } from './config';
 
-const redisClient = createClient({
-	url: config.redis,
+const redis = createClient({
+	url: config.redis.connection,
 });
 
 const fib = (index: number): number => {
@@ -11,11 +11,22 @@ const fib = (index: number): number => {
 	return fib(index - 1) + fib(index - 2);
 };
 
-const sub = redisClient.duplicate();
+(async () => {
+	await redis.connect();
 
-sub.on('message', (channel, message: string) => {
-	console.log('Event received - Message: ' + message);
-	redisClient.hSet('fibonnaci-values', message, fib(Number(message)));
-});
+	const subscriber = redis.duplicate();
 
-sub.subscribe('insert', () => console.log('Subscribed to event...'));
+	await subscriber.connect();
+
+	await subscriber.subscribe('insert', (index: string) => {
+		console.log('Insert event - BEGIN - Index: ' + index);
+
+		const calculatedNumber: string = fib(Number(index)).toString();
+
+		console.log('Insert event - END - Result: ' + calculatedNumber);
+
+		redis.HSET('fibonnaci-values', {
+			[index]: calculatedNumber,
+		});
+	});
+})();

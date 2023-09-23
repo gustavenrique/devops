@@ -1,4 +1,3 @@
-import { Request, Response } from 'express';
 import postgres from '../repositories/postgres.repository';
 import {
 	InternalServerError,
@@ -31,13 +30,7 @@ export const getAllComplete = async (): Promise<
 	ResponseWrapper<FibonnaciEntity[] | null>
 > => {
 	try {
-		let result: FibonnaciEntity[] | null = null;
-
-		redis.hgetall('fibonnaci-values', (err, values) => {
-			result = JSON.parse(
-				values['fibonnaci-values']
-			) as FibonnaciEntity[];
-		});
+		const result: FibonnaciEntity[] = await getValuesComplete();
 
 		return Ok('Values retrieved successfully', result);
 	} catch (error) {
@@ -45,6 +38,29 @@ export const getAllComplete = async (): Promise<
 
 		return InternalServerError<FibonnaciEntity[]>();
 	}
+};
+
+const getValuesComplete: () => Promise<Array<FibonnaciEntity>> = async () => {
+	return new Promise((resolve, reject) => {
+		try {
+			redis.hgetall('fibonnaci-values', (err, values) => {
+				let result: FibonnaciEntity[] = new Array<FibonnaciEntity>();
+
+				if (values)
+					for (const key in values)
+						result.push(
+							new FibonnaciEntity(
+								Number(key),
+								Number(values[key])
+							)
+						);
+
+				resolve(result);
+			});
+		} catch (error) {
+			reject(error);
+		}
+	});
 };
 
 export const create = async ({
@@ -58,7 +74,11 @@ export const create = async ({
 
 		redis.hset('fibonnaci-values', index.toString(), '');
 
+		console.log('going to publish to redis');
+
 		redis.duplicate().publish('insert', index.toString());
+
+		console.log('published successfully');
 
 		postgres.query('INSERT INTO fibonnaci (index) VALUES ($1)', [index]);
 

@@ -1,26 +1,33 @@
 version: '3'
 
 services:
+  router:
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile.dev
+    restart: always
+    ports:
+      - 8080:80
+    depends_on:
+      - fib-api
+      - fib-ui
+
   postgres:
     image: 'postgres:16-bookworm'
     restart: always
     environment:
       - POSTGRES_PASSWORD=dev_password#
-    ports: 
-      - 5432:5432
 
   redis:
     image: 'redis:7.2-bookworm'
     restart: always
-    ports: 
-      - 6379:6379
 
   fib-api:
     build: 
       context: ./api
       dockerfile: Dockerfile.dev
     image: gustavenrique/fib-api:dev
-    restart: unless-stopped
+    restart: always
     volumes:
       - /app/node_modules
       - ./api:/app
@@ -33,8 +40,6 @@ services:
       - POSTGRES_HOST=postgres
       - POSTGRES_PORT=5432
       - PORT=5000
-    ports:
-      - 5000:5000
     depends_on:
       - postgres
       - redis
@@ -49,20 +54,18 @@ services:
       - /app/node_modules
       - ./worker:/app
     environment:
-      - REDIS_HOST=redis
-      - REDIS_PORT=6379
+      - REDIS_CONNECTION=redis://redis:6379
     depends_on:
       - redis
       
   fib-ui:
     build:
-      context: ./client
+      context: ./ui
       dockerfile: Dockerfile.dev
     image: gustavenrique/fib-ui:dev
     restart: always
     volumes: 
-      - /app/app_modules
-      - ./client:/app
-
-
-# redis://redis:6379
+      - /app/node_modules
+      - ./ui:/app
+    environment:
+      - WDS_SOCKET_PORT=0
