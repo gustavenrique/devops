@@ -10,5 +10,7 @@ The applications in this repo are microservices used for calculating fibonnaci n
     - Redis: to store the calculated numbers
     - PostgreSQL: to store the fib number indexes the user asks for
 
+![fib-architecture](https://github.com/gustavenrique/devops/assets/81171856/64e1886c-a021-4a07-b1a2-a69c89e751ba)
+
 ---
 Pretty much everything was inspired by [Stephen Grider](https://www.udemy.com/course/docker-and-kubernetes-the-complete-guide/)
