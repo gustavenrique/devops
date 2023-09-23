@@ -1,5 +1,5 @@
 {
-  "name": "fibonnaci-api",
+  "name": "fib-api",
   "license": "UNLICENSED",
   "scripts": {
     "start": "tsx src/main.ts",

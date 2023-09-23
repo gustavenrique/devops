@@ -1,5 +1,5 @@
 {
-  "name": "fibonnaci-worker",
+  "name": "fib-worker",
   "license": "UNLICENSED",
   "scripts": {
     "start": "tsx src/main.ts",
