@@ -19,15 +19,11 @@ class Fib extends Component {
     fetchValues = async () => {
         const { data: { data } } = await axios.get('/api/values/');
 
-        console.dir('from postgres', data);
-
         if (data) this.setState({ values: data });
     }
 
     fetchIndexes = async () => {
         const { data: { data } } = await axios.get('/api/values/all-complete');
-
-        console.dir('from redis', data);
 
         if (data) this.setState({ seenIndexes: data });
     }
@@ -37,8 +33,6 @@ class Fib extends Component {
             e.preventDefault();
 
             const response = await axios.post('/api/values', { index: this.state.index });
-
-            console.dir('response: ', response);
 
             this.setState({ index: '' })
         } catch (error) {
