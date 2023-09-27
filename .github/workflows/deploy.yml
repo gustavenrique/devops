@@ -26,6 +26,7 @@ jobs:
               run: docker run -e CI=true gustavenrique/fib-ui:dev npm test
 
     build:
+        needs: test
         runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@v3

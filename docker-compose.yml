@@ -33,9 +33,6 @@ services:
         image: gustavenrique/fib-api
         container_name: fib-api
         restart: always
-        volumes:
-            - /app/node_modules
-            - ./api:/app
         environment:
             - REDIS_HOST=redis
             - REDIS_PORT=6379
@@ -56,9 +53,6 @@ services:
         image: gustavenrique/fib-worker
         container_name: fib-worker
         restart: unless-stopped
-        volumes:
-            - /app/node_modules
-            - ./worker:/app
         environment:
             - REDIS_CONNECTION=redis://redis:6379
         depends_on:
@@ -71,8 +65,5 @@ services:
         image: gustavenrique/fib-ui
         container_name: fib-ui
         restart: always
-        volumes:
-            - /app/node_modules
-            - ./ui:/app
         environment:
             - WDS_SOCKET_PORT=3000
