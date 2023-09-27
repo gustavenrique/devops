@@ -5,7 +5,8 @@ class Fib extends Component {
     state = {
         seenIndexes: [],
         values: [],
-        index: ''
+        index: '',
+        message: '',
     }
 
     async componentDidMount() {
@@ -34,7 +35,7 @@ class Fib extends Component {
 
             const response = await axios.post('/api/values', { index: this.state.index });
 
-            this.setState({ index: '' })
+            this.setState({ index: '', message: response?.data?.message })
         } catch (error) {
             console.error(error);
         }
@@ -43,6 +44,8 @@ class Fib extends Component {
     render() {
         return (
             <div>
+                <h2 style={{ textAlign: 'center' }}>{this?.state?.message}</h2>
+
                 <form onSubmit={this.handleSubmit}>
                     <label>Enter your index:</label>
                     <input value={this.state.index} onChange={({ target: { value } }) => this.setState({ index: value })} />
