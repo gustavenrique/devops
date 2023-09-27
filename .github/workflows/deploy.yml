@@ -1,0 +1,61 @@
+name: Deploy
+
+on:
+    push:
+        branches: [main]
+
+    pull_request:
+        branches: ['feature/**', 'hotfix/**']
+
+jobs:
+    test:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v3
+
+            - name: Build test images
+              run: docker compose -f docker-compose.dev.yml build
+
+            - name: Test Worker
+              run: docker run -e CI=true gustavenrique/fib-worker:dev yarn test
+
+            - name: Test API
+              run: docker run -e CI=true gustavenrique/fib-api:dev yarn test
+
+            - name: Test UI
+              run: docker run -e CI=true gustavenrique/fib-ui:dev npm test
+
+    build:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v3
+
+            - name: Build Images
+              run: docker compose build
+
+            - name: Docker Login
+              run: docker login -u ${{ secrets.DOCKER_USERNAME }} -P ${{ secrets.DOCKER_PASSWORD }}
+
+            - name: Publish Worker Image
+              run: docker push gustavenrique/fib-worker
+
+            - name: Publish API Image
+              run: docker push gustavenrique/fib-api
+
+            - name: Publish UI Image
+              run: docker push gustavenrique/fib-ui
+
+            - name: Generate ZIP package
+              run: zip -r deploy.zip . -x '*.git*'
+
+            - name: Deploy to EB
+              uses: einaregilsson/beanstalk-deploy@v21
+              with:
+                  aws_access_key: ${{ secrets.AWS_ACCESS_KEY }}
+                  aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+                  application_name: MyApplicationName
+                  environment_name: MyApplication-Environment
+                  existing_bucket_name: elasticbeanstalk-us-east-2-1-8328746823
+                  version_label: ${{ github.sha }}
+                  region: us-west-2
+                  deployment_package: deploy.zip

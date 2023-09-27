@@ -4,8 +4,8 @@ services:
     proxy:
         build:
             context: ./nginx
-            dockerfile: Dockerfile.dev
-        image: gustavenrique/proxy:dev
+            dockerfile: Dockerfile
+        image: gustavenrique/proxy
         container_name: gustavenrique/fib-proxy
         restart: always
         ports:
@@ -19,7 +19,7 @@ services:
         container_name: postgres
         restart: always
         environment:
-            - POSTGRES_PASSWORD=dev_password#
+            - POSTGRES_PASSWORD=j3iy8.32HD1u@@w#
 
     redis:
         image: 'redis:7.2-bookworm'
@@ -29,8 +29,8 @@ services:
     fib-api:
         build:
             context: ./api
-            dockerfile: Dockerfile.dev
-        image: gustavenrique/fib-api:dev
+            dockerfile: Dockerfile
+        image: gustavenrique/fib-api
         container_name: fib-api
         restart: always
         volumes:
@@ -40,7 +40,7 @@ services:
             - REDIS_HOST=redis
             - REDIS_PORT=6379
             - POSTGRES_USER=postgres
-            - POSTGRES_PASSWORD=dev_password#
+            - POSTGRES_PASSWORD=j3iy8.32HD1u@@w#
             - POSTGRES_DATABASE=postgres
             - POSTGRES_HOST=postgres
             - POSTGRES_PORT=5432
@@ -52,8 +52,8 @@ services:
     fib-worker:
         build:
             context: ./worker
-            dockerfile: Dockerfile.dev
-        image: gustavenrique/fib-worker:dev
+            dockerfile: Dockerfile
+        image: gustavenrique/fib-worker
         container_name: fib-worker
         restart: unless-stopped
         volumes:
@@ -67,8 +67,8 @@ services:
     fib-ui:
         build:
             context: ./ui
-            dockerfile: Dockerfile.dev
-        image: gustavenrique/fib-ui:dev
+            dockerfile: Dockerfile
+        image: gustavenrique/fib-ui
         container_name: fib-ui
         restart: always
         volumes:
